@@ -250,19 +250,23 @@ def clustring(dataframe, cluster_number):
     dataframe.
 
     """
+    # Combining the dataframes 
+    combined_df = pd.concat(dataframe.values(), axis=0)  # Adjust axis as needed
+    
+    
     # loop over trial numbers of clusters calculating the silhouette 
     for ic in range(2, 7):
         # set up kmeans and fit
         kmeans = cluster.KMeans(n_clusters=ic)
-        kmeans.fit(dataframe)
+        kmeans.fit(combined_df)
         
         # extract labels and calculate silhoutte score
         labels = kmeans.labels_
-        print (ic, skmet.silhouette_score(dataframe, labels))
+        print (ic, skmet.silhouette_score(combined_df, labels))
         
     # Using K-Mean clustring
-    kmeans = cluster.KMeans(cluster_number)
-    kmeans.fit(dataframe)
+    kmeans = cluster.KMeans(n_clusters = cluster_number)
+    kmeans.fit(combined_df)
     
     # extract labels and cluster centres
     labels = kmeans.labels_
@@ -377,10 +381,10 @@ def main():
     
     # Clustring the selected data
     # Clustring with 3
-    clustered_data, labels, cen = clustring(normalized_data, 3)
+    clustered_data, labels, center = clustring(normalized_data, 3)
     
     # Scatter plot of clusteerin with 3
-    scatter_plot_clustring(clustered_data, labels, cen)
+    #scatter_plot_clustring(clustered_data, labels, center)
     
     
     
@@ -388,3 +392,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
