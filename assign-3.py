@@ -201,11 +201,12 @@ def copy_dataframes(dfs, selected_dfs):
 
     """
     selected_indicator_data = {}
-    
+
     for indicator in selected_dfs:
-        if indicator in dfs:
-            selected_indicator_data[indicator] = dfs[indicator].copy()
-    
+        for key, df in dfs.items():
+            if df.equals(indicator):
+                selected_indicator_data[key] = df.copy()
+
     return selected_indicator_data
 
 
@@ -234,7 +235,7 @@ def normalize_df(df_dict):
     return normalized_dataframes, min_max_values
 
 
-def clustring(dataframe, cluster_number):
+def clustring(normalized_dataframes, cluster_number):
     """
     making cluters between the different dataframes by normalizing data
 
@@ -250,32 +251,20 @@ def clustring(dataframe, cluster_number):
     dataframe.
 
     """
-    # Combining the dataframes 
-    combined_df = pd.concat(dataframe.values(), axis=0)  # Adjust axis as needed
-    
-    
-    # loop over trial numbers of clusters calculating the silhouette 
-    for ic in range(2, 7):
-        # set up kmeans and fit
-        kmeans = cluster.KMeans(n_clusters=ic)
-        kmeans.fit(combined_df)
+    cluster_labels = {}
+    cluster_centers = {}
+
+    for key, df in normalized_dataframes.items():
+        kmeans = cluster.KMeans(n_clusters=cluster_number)
+        kmeans.fit(df)
         
-        # extract labels and calculate silhoutte score
-        labels = kmeans.labels_
-        print (ic, skmet.silhouette_score(combined_df, labels))
-        
-    # Using K-Mean clustring
-    kmeans = cluster.KMeans(n_clusters = cluster_number)
-    kmeans.fit(combined_df)
+        cluster_labels[key] = kmeans.labels_
+        cluster_centers[key] = kmeans.cluster_centers_
     
-    # extract labels and cluster centres
-    labels = kmeans.labels_
-    cen = kmeans.cluster_centers_
-    
-    return dataframe, labels, cen
+    return cluster_labels, cluster_centers
 
 
-def scatter_plot_clustring(dataframe, cluster_labels, cluster_centers):
+def scatter_plot_clustring(normalized_dataframes, x_indicator, y_indicator, cluster_labels, cluster_centers):
     """
     plot a scatter plot for showing clusters
 
@@ -294,17 +283,26 @@ def scatter_plot_clustring(dataframe, cluster_labels, cluster_centers):
     None.
 
     """
-    plt.scatter(dataframe["co2_emission"], dataframe["electricity_access"], c=cluster_labels, cmap="tab10") # colour map Accent selected to increase contrast between colours
+    x_data = normalized_dataframes[x_indicator]
+    y_data = normalized_dataframes[y_indicator]
+    labels = cluster_labels[y_indicator]  # Assuming cluster labels are for the y-axis indicator
     
-    # show cluster centres
-    xc = cluster_centers[:,0]
-    yc = cluster_centers[:,1]
-    plt.scatter(xc, yc, c="k", marker="d", s=80) # c = colour, s = size
-    plt.xlabel("total length")
-    plt.ylabel("height")
-    plt.title("4 clusters")
+    centers = cluster_centers[y_indicator]  # Centers for the y-axis indicator
+    
+    # Reshape the data for clustering
+    x_values = x_data.values.flatten()
+    y_values = y_data.values.flatten()
+
+    # Plotting the entire dataset with clustering information
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x_values, y_values, c=labels, cmap='viridis')
+
+    plt.title("Scatter Plot for All Years with Clusters")
+    plt.xlabel("X-axis Label")
+    plt.ylabel("Y-axis Label")
+    plt.colorbar(label='Cluster')
+    plt.grid(True)
     plt.show()
-    
     
 def main():
     """
@@ -343,7 +341,7 @@ def main():
     # Calling the function to filter data for all the indicators
     selected_data = filtered_data(dataframes)
     
-    # Printing indicators for each filtered data frame
+    # Printing indicators for each filtered dataframe
     for key, df in selected_data.items():
         print(f"Indicators for {key}:")
         print(df.head())
@@ -362,13 +360,15 @@ def main():
     corr_heatmap(selected_data)
     
     # Selecting the indicators for clustring
-    selected_indicators = ['co2_emission', 'electricity_access']  
+    selected_indicators = [selected_data["CO2_emission"], selected_data["electricity_access"]]  
     
     # Calling the function to copy the selected indicators
     selected_indicator_data = copy_dataframes(selected_data, selected_indicators)
+    #print("data: ", selected_indicator_data)
     
     #normalizing selected dataframes 
     normalized_data, min_max_values = normalize_df(selected_indicator_data)
+    #print("Normalized data: ", normalized_data)
     
     # Getting a summary of each normalized indicator
     summary_stats = summary_statistics(normalized_data)
@@ -381,10 +381,18 @@ def main():
     
     # Clustring the selected data
     # Clustring with 3
-    clustered_data, labels, center = clustring(normalized_data, 3)
+    labels, center = clustring(normalized_data, 3)
     
+    print("lengths: ", len(normalized_data["CO2_emission"]), len(normalized_data["electricity_access"]), len(labels["CO2_emission"]))
+    
+    # Ensure alignment
+    print("x_data:", normalized_data["CO2_emission"][:5])  # Check the first few elements
+    print("y_data:", normalized_data["electricity_access"][:5])  # Check the first few elements
+    print("labels:", labels["CO2_emission"][:5])  # Check the first few elements
+      
+  
     # Scatter plot of clusteerin with 3
-    #scatter_plot_clustring(clustered_data, labels, center)
+    scatter_plot_clustring(normalized_data, "CO2_emission", "electricity_access", labels, center)
     
     
     
