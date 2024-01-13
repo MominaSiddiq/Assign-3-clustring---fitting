@@ -121,30 +121,7 @@ def filtered_data(df, start_year, end_year):
     return filtered_df
 
 
-# Obtaining the summary statistics of data by the describe method
-def summary_statistics(data):
-    """
-    applies describe method on different indicators.
-
-    Parameters
-    ----------
-    data : pandas dataframe
-       The numerical data to analyze
-
-    Returns
-    -------
-    summary_stats
-        summary of selected data.
-
-    """
-    summary = {}
-    for key, df in data.items():
-        summary[key] = df.describe()
-    
-    return summary  
-
-
-def corr_heatmap(dataframes):
+def corr_heatmap(dataframes, df_names):
     """
     produce a correlation map and creates scatter plots
 
@@ -158,8 +135,8 @@ def corr_heatmap(dataframes):
     None.
 
     """
-   # Calculate mean of each dataframe
-    summary_data = {key: df.mean() for key, df in dataframes.items()}
+   # Calculate mean of each dataframe and apply name mapping
+    summary_data = {df_names[key]: df.mean() for key, df in dataframes.items() if key in df_names}
     
     # Concatenate summary data into a single dataframe
     summary_df = pd.DataFrame(summary_data)
@@ -183,30 +160,6 @@ def corr_heatmap(dataframes):
         plt.show()
     else:
         print("No numeric data available to plot.")
-
-    """
-    # Calculate mean of each dataframe
-    summary_data = {key: df.mean() for key, df in dataframes.items()}
-    
-    # Concatenate summary data into a single dataframe
-    summary_df = pd.DataFrame(summary_data)
-    
-    title = "Correaltion Heatmap between Indicators"
-    
-    # heatmap
-    ct.map_corr(summary_df, title, 9)
-    
-    # Ensure all data can be converted to numeric, otherwise set as NaN
-    summary_numeric = summary_df.apply(pd.to_numeric, errors='coerce')
-    summary_numeric.dropna(axis=1, how='all', inplace=True)
-    
-    if len(summary_numeric.columns) > 1:  # Checking if there are more than one numeric columns
-        pd.plotting.scatter_matrix(summary_numeric, figsize=(9.0, 9.0)) 
-        plt.tight_layout()
-        plt.show()
-    else:
-        print("No numeric data available to plot.")
-"""
 
 
 def extract_data(selected_data, indicators, countries, years):
