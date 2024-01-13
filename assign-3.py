@@ -250,63 +250,41 @@ def perform_clustering_and_find_centers(data, num_clusters, features):
     return data, cluster_centers
 
 
-def scatter_plot_clustering(data, x1, y1, x2, y2, title, xlabel, ylabel):
+def visualize_clusters(data, cluster_column, feature_columns, centers):
     """
-    Plot a scatter plot for showing clusters of combined data from two indicators
+    Visualize the clustering results.
 
-    Parameters
-    ----------
-    data : pandas DataFrame
-        DataFrame containing the combined data of two indicators.
+    Parameters:
+    data (pd.DataFrame): The clustered dataset.
+    cluster_column (str): The name of the column containing cluster labels.
+    feature_columns (list): List of column names to use for visualization.
 
-    x1 : str
-        Name of the column for x-axis of indicator 1.
-
-    y1 : str
-        Name of the column for y-axis of indicator 1.
-
-    x2 : str
-        Name of the column for x-axis of indicator 2.
-
-    y2 : str
-        Name of the column for y-axis of indicator 2.
-
-    title : str
-        Title of the plot.
-
-    xlabel : str
-        Label for x-axis.
-
-    ylabel : str
-        Label for y-axis.
-
-    Returns
-    -------
-    None
+    Returns:
+    None: The function will output plots directly.
     """
-    plt.figure(figsize=(10, 5))
-    plt.scatter(data[x1],
-                data[y1],
-                c=data['Cluster'],
-                cmap='viridis',
-                label='Indicator 1')  # Plot for indicator 1
+   # Create a pairplot colored by cluster labels
+    pairplot_fig = sns.pairplot(data, vars=feature_columns, hue=cluster_column, palette='bright')
+    plt.suptitle('Pairplot of Features by Cluster', y=1.02)
 
-    plt.scatter(data[x2],
-                data[y2],
-                c=data['Cluster'],
-                cmap='plasma',
-                marker='x',
-                label='Indicator 2')  # Plot for indicator 2
-
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.legend()
-    plt.colorbar(label='Cluster')
+    # Extract axes from pairplot to plot centers
+    axes = pairplot_fig.axes
+    num_features = len(feature_columns)
+    for i in range(num_features):
+        for j in range(num_features):
+            if i != j:
+                ax = axes[i][j]
+                ax.scatter(centers[:, j], centers[:, i], c='red', s=100, marker='X')  # Plot centers
+    
     plt.show()
+    
+    # Create individual bar plots for each feature by cluster
+    for feature in feature_columns:
+        plt.figure(figsize=(8, 4))
+        sns.barplot(x=cluster_column, y=feature, data=data)
+        plt.title(f'Average {feature} by Cluster')
+        plt.show()
 
    
-      
 def main():
     """
     A main function calling other functions.
@@ -399,6 +377,12 @@ def main():
     
     # Performing clustering on the merged data 
     clustered_data, cluster_centers = perform_clustering_and_find_centers(merged_data, num_clusters, features_to_cluster)
+    
+    # Visualizing clusters
+    cluster_column = 'Cluster'  
+    features_for_visualization = ['CO2_Emission', 'Renewable_Energy']  
+
+    visualize_clusters(clustered_data, cluster_column, features_for_visualization, cluster_centers)
     
 
     
