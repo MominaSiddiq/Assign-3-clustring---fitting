@@ -331,82 +331,68 @@ def main():
     None.
 
     """
+    # List of files
+    filename = ["CO2_emission.csv", "renewable_energy_consumption.csv", 
+                "population_growth.csv", "greenhouse_gas_emission.csv", 
+                "GDP_per_capita.csv"]
     
-    # Callig the read function and saving each dataframes into variables
-    co2_emission_data, co2_emission_trans = read_data(co2_emission)
-    energy_consumption_data, energy_consumption_trans = read_data(energy_consumption)
-    popu_growth_data, popu_growth_trans = read_data(popu_growth)
-    elec_access_data, elec_access_trans = read_data(elec_access)
-    greenhouse_emission_data, greenhouse_emission_trans = read_data(greenhouse_emission)
+    # Process each file and save the transposed data
+    transposed_files = []  # To keep track of the new transposed files
     
-    # selecting countries
-    global selected_countries
-    selected_countries = ['Qatar', 'China', 'United Kingdom', 'Portugal', 
-                          'United States', 'South Asia', 'South Africa']
+    for file in filename:
+        # Process the data
+        country_col_df, years_col_df = read_data(file)
 
-    # Selecting years
-    global selected_years
-    selected_years = [str(year) for year in range(start_year, end_year + 1)]
-    
-    # Creating a list of all the transformed dataframes
-    dataframes = {
-        "popu_growth" : popu_growth_data,
-        "renewable_Econsume": energy_consumption_data,
-        "electricity_access": elec_access_data,
-        "greenhouse_emission" : greenhouse_emission_data,
-        "CO2_emission": co2_emission_data
-    }
-    
-    # Calling the function to filter data for all the indicators
-    selected_data = filtered_data(dataframes)
-    
-    # Printing indicators for each filtered dataframe
-    for key, df in selected_data.items():
-        print(f"Indicators for {key}:")
-        print(df.head())
-        print("=" * 50)
-        
-    # Getting a summary of each filtered indicator
-    summary_stats = summary_statistics(selected_data)
+        # Create a new filename for the transposed data
+        transposed_filename = file.replace('.csv', '_trans.csv')
+        transposed_files.append(transposed_filename)
 
-    # Printing summary statistics for each filtered indicator
-    for key, stats in summary_stats.items():
-        print(f"Summary statistics for {key}:")
-        print(stats)
-        print("=" * 50)
+        # Save the transposed data
+        country_col_df.to_csv(transposed_filename, index=False)
    
-    # Calling the correlation heat map function
-    corr_heatmap(selected_data)
-    
-    selected_indicators = ['CO2_emission', 'renewable_Econsume']
+    # selecting years
+    start_year = 1990
+    end_year = 2020
 
-    selected_indicators_data = {indicator: selected_data[indicator] for indicator in selected_indicators}
-    
-    #normalizing selected dataframes 
-    normalized_data, min_values, max_values = normalize_data(selected_indicators_data)
-    print("normalize data: ", normalized_data)
-    
-    # Getting a summary of each normalized indicator
-    summary_stats = summary_statistics(normalized_data)
+    # List to store filtered DataFrames
+    filtered_dfs = {}
 
-    # Printing summary statistics for each filtered indicator
-    for key, stats in summary_stats.items():
-        print(f"Summary statistics for {key}:")
-        print(stats)
-        print("=" * 50)
-    
-    # Clustring the selected data
-    # Clustring with 3
-    clustered_data = clustering(normalized_data, 3)
+    # Read and filter each transposed file
+    for transposed_file in transposed_files:
+        # Read the transposed data
+        df = pd.read_csv(transposed_file)
 
-    x1 = 'CO2_emission'
-    y1 = 'renewable_Econsume'
+        # Filter the data
+        filtered_df = filtered_data(df, start_year, end_year)
 
-    scatter_plot_clustering(clustered_data, x1, y1,
-                            x1, y1,  
-                            "CO2_emission vs Renewable_Energy_Consume", 
-                            "Renewable_Energy_Consume", "CO2_Emission")
+        # Add the filtered DataFrame to the list
+        filtered_dfs[transposed_file] = filtered_df
         
+        # Add the filtered DataFrame to the dictionary
+        if filtered_df is not None:
+            filtered_dfs[transposed_file] = filtered_df
+            print(f"Filtered data from {transposed_file} added to the list")
+        else:
+            print(f"Skipped {transposed_file} due to missing 'Country Name' column.")
+            
+    # Print the filtered data for each file in the dictionary
+    for filename, filtered_df in filtered_dfs.items():
+        print(f"Filtered data from {filename}:")
+        print(filtered_df)
+        print("\n")  
+        
+    # Mapping of long file names to short labels
+    df_short_names = {
+        'CO2_emission_trans.csv': 'CO2_emission',
+        'renewable_energy_consumption_trans.csv': 'Renewable Energy',
+        'population_growth_trans.csv': 'Population Growth',
+        'GDP_per_capita_trans.csv' : 'GDP_per_capita',
+        'greenhouse_gas_emission_trans.csv': 'Greenhouse Gas'
+    }
+       
+ 
+    # Calling the correlation heat map function
+    corr_heatmap(filtered_dfs, df_short_names)
     
 
 if __name__ == "__main__":
