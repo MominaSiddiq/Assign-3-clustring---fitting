@@ -218,37 +218,36 @@ def merge_datasets(df1, df2, countries, df1_column_name, df2_column_name):
     return pd.DataFrame(merged_data_list)
 
         
-def clustering(extracted_df, cluster_number):
+def perform_clustering_and_find_centers(data, num_clusters, features):
     """
-    making cluters between the different dataframes by normalizing data
+    Perform clustering on the provided dataset and find the cluster centers.
 
-    Parameters
-    ----------
-    dataframe : python dataframe
-    
-    cluster_number : integer
-        number of cluters make.
+    Parameters:
+    data (pd.DataFrame): The dataset to cluster.
+    num_clusters (int): The number of clusters to form.
+    features (list): List of column names to use for clustering.
 
-    Returns
-    -------
-    dataframe.
-
+    Returns:
+    tuple: 
+        - The original dataset with an additional 'Cluster' column.
+        - The cluster centers as a numpy array.
     """
-    normalized_df = {}
-    min_vals = {}
-    max_vals = {}
+    # Normalizing the data
+    scaler = StandardScaler()
+    data_normalized = scaler.fit_transform(data[features])
+
+    # Applying K-means clustering
+    kmeans = KMeans(n_clusters=num_clusters, random_state=0)
+    kmeans.fit(data_normalized)
+    clusters = kmeans.predict(data_normalized)
+
+    # Adding the cluster labels to the original data
+    data['Cluster'] = clusters
     
-    # Normalize the data
-    normalized_df, min_vals, max_vals = ct.scaler(extracted_df)
-    
-    # Applying k-means clustering on the data
-    kmeans = cluster.KMeans(n_clusters=cluster_number)
-    labels = kmeans.fit_predict(normalized_df)
-    
-    extracted_df['Cluster'] = labels
-    
-    #return labels, kmeans.cluster_centers_
-    return extracted_df
+    # Getting the cluster centers
+    cluster_centers = scaler.inverse_transform(kmeans.cluster_centers_)
+
+    return data, cluster_centers
 
 
 def scatter_plot_clustering(data, x1, y1, x2, y2, title, xlabel, ylabel):
@@ -393,6 +392,14 @@ def main():
     
     # Merging datasets for clusters 
     merged_data = merge_datasets(co2_df, renewable_df, selected_countries, "CO2_Emission", "Renewable_Energy")
+    
+    # Assuming 'merged_data' is your merged dataset and you want to cluster based on CO2 emissions and renewable energy
+    features_to_cluster = ['CO2_Emission', 'Renewable_Energy']
+    num_clusters = 3  # You can adjust the number of clusters as needed
+    
+    # Performing clustering on the merged data 
+    clustered_data, cluster_centers = perform_clustering_and_find_centers(merged_data, num_clusters, features_to_cluster)
+    
 
     
     
