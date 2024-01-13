@@ -434,6 +434,48 @@ def plot_emissions(country, years, emissions, future_years, popt, pcov, title):
     plt.ylabel('Emissions')
     plt.legend()
     plt.show()
+    
+    
+# Main analysis function
+def run_analysis(df, countries, start_year, end_year, future_year_span, title):
+    """
+    Plots historical emissions data and future predictions with confidence intervals for a given country.
+
+    Parameters:
+    ----------
+    country : str
+        The name of the country for which emissions data is plotted.
+    years : array_like
+        Array of years for the historical data.
+    emissions : array_like
+        Array of observed emission values corresponding to the years.
+    future_years : array_like
+        Array of future years for which predictions are made.
+    popt : array_like
+        Optimal parameters obtained from the curve fitting process.
+    pcov : 2d array_like
+        Covariance matrix of the optimal parameters.
+    title : str
+        The title for the plot.
+
+    Returns:
+    -------
+    None: Displays a plot showing historical emissions, fitted model, and future predictions with confidence intervals.
+
+    """
+    # Ensure the index is integer-based for proper slicing
+    df.index = pd.to_numeric(df.index)
+    
+    for country in countries:
+        # Extract data for the country
+        emissions = df.loc[start_year:end_year, country].values
+        years = np.arange(start_year, end_year + 1)
+
+        # Fit the model and predict future values
+        popt, pcov = fit_model(years, emissions)
+
+        future_years = np.arange(end_year + 1, end_year + future_year_span + 1)
+        plot_emissions(country, years, emissions, future_years, popt, pcov, title)
 
    
 def main():
@@ -534,6 +576,20 @@ def main():
     features_for_visualization = ['CO2_Emission', 'Renewable_Energy']  
 
     visualize_clusters(clustered_data, cluster_column, features_for_visualization, cluster_centers)
+    
+    greenhouse_df = filtered_dfs['greenhouse_gas_emission_trans.csv']
+    gdp_df = filtered_dfs['GDP_per_capita_trans.csv']
+    
+    # Transpose the DataFrame so that each row is a year and each column is a country
+    greenhouse_df_transposed = greenhouse_df.transpose()
+    gdp_df_transposed = gdp_df.transpose()
+
+    # List of selected countries and the range of years for prediction
+    selected_countries = ['India', 'Germany', 'Kenya']
+    title_ghg = "Greenhouse Gases Emission"
+    title_gdp = "GDP_per_capita"
+    run_analysis(greenhouse_df_transposed, selected_countries, 1990, 2020, 20, title_ghg)
+    run_analysis(gdp_df_transposed, selected_countries, 1990, 2020, 20, title_gdp)
     
 
     
