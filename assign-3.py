@@ -162,38 +162,28 @@ def corr_heatmap(dataframes, df_names):
         print("No numeric data available to plot.")
 
 
-def extract_data(selected_data, indicators, countries, years):
+def population_growth_pie(filtered_data, selected_countries):
     """
-    Extract data for specific indicators, countries, and years
+    Plots a pie chart of the total population growth for selected countries over the years 1990 to 2020.
 
-    Parameters
-    ----------
-    selected_data : Python dictionary
-        Dictionary containing filtered indicators.
+    Parameters:
+    filtered_data (pd.DataFrame): The filtered DataFrame containing population growth data.
+    selected_countries (list): List of countries to include in the pie chart.
 
-    indicators : List
-        List of indicators to consider.
-
-    countries : List
-        List of countries to consider.
-
-    years : List
-        List of years to consider.
-
-    Returns
-    -------
-    Pandas DataFrame containing data for the specified indicators, countries, and years.
+    Returns:
+    None: Displays a pie chart.
     """
-    extracted_data = {}
-    for indicator in indicators:
-        data = selected_data[indicator].loc[countries, years]
-        extracted_data[indicator] = data
-        
-    # Combine selected data
-    combine_data = pd.concat(extracted_data, axis=1)
-    print("combined data: ", combine_data)
     
-    return combine_data
+    # Assuming the country names are the index of the DataFrame
+    population_data = filtered_data.loc[selected_countries]
+
+    # Calculate the total population growth over the years 1990 to 2020 for selected countries
+    total_population_growth = population_data.sum(axis=1)
+
+    # Plotting the pie chart
+    plt.figure(figsize=(10, 8))
+    plt.pie(total_population_growth, labels=total_population_growth.index, autopct='%1.1f%%', startangle=140)
+    plt.show()
 
 
 def normalize_data(df_dict):
@@ -393,6 +383,18 @@ def main():
  
     # Calling the correlation heat map function
     corr_heatmap(filtered_dfs, df_short_names)
+    
+    # Extract data from the dictionary 
+    pop_df = filtered_dfs['population_growth_trans.csv']
+    co2_df = filtered_dfs['CO2_emission_trans.csv']
+    renewable_df = filtered_dfs['renewable_energy_consumption_trans.csv']
+    
+    # Selected countries for visualization
+    selected_countries = ['United States', 'India', 'Kenya', 'Germany', 'Brazil', 'China', 'Australia', 'South Africa', 'Japan', 'Canada']
+    
+    # Population growth pie chart
+    population_growth_pie(pop_df, selected_countries)
+    
     
 
 if __name__ == "__main__":
