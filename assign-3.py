@@ -339,6 +339,53 @@ def fit_model(years, emissions):
     return popt, pcov
 
 
+# Error range calculation function
+def err_ranges(x, popt, pcov, confidence=0.95):
+    """
+    
+
+    Calculates the confidence intervals for the fitted model predictions.
+
+    Parameters
+    ----------
+    x : array_like
+        The independent variable values where the predictions are to be made.
+        
+    popt : array_like
+        Optimal values for the parameters so that the sum of the squared residuals of f(xdata, *popt) - ydata is minimized.
+        
+    pcov : 2d array_like
+        The estimated covariance of popt. The diagonals provide the variance of the parameter estimate.
+        
+    confidence : float, optional
+        The confidence level for the interval calculation. The default is 0.95 for a 95% confidence interval.
+
+    Returns
+    -------
+    y_upper : array_like
+        Upper prediction boundary of the confidence interval.
+        
+    y_lower : array_like
+        Lower prediction boundary of the confidence interval.
+
+    """
+    # Predictions from the model
+    y_model = poly_model(x, *popt)
+    
+    # Calculate the variance at each point from parameter covariance
+    var_model = np.array([x**2, x, np.ones_like(x)]).T @ pcov @ np.array([x**2, x, np.ones_like(x)])
+    
+    sigma = np.sqrt(np.diag(var_model))  # Standard deviation at each point
+    
+    # The t value for confidence interval
+    t_val = t.ppf((1+confidence)/2., len(x)-len(popt))
+    
+    # Upper and lower bounds
+    y_upper = y_model + t_val * sigma
+    y_lower = y_model - t_val * sigma
+    
+    return y_upper, y_lower
+
    
 def main():
     """
