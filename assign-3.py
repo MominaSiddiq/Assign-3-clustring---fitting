@@ -274,6 +274,7 @@ def perform_clustering_and_find_centers(data, num_clusters, features):
 
     # Adding the cluster labels to the original data
     data['Cluster'] = clusters
+    
 
     # Getting the cluster centers
     cluster_centers = scaler.inverse_transform(kmeans.cluster_centers_)
@@ -583,16 +584,9 @@ def main():
         # Add the filtered DataFrame to the dictionary
         if filtered_df is not None:
             filtered_dfs[transposed_file] = filtered_df
-            print(f"Filtered data from {transposed_file} added to the list")
         else:
             print(
                 f"Skipped {transposed_file} due to missing 'Country Name' column.")
-
-    # Print the filtered data for each file in the dictionary
-    for filename, filtered_df in filtered_dfs.items():
-        print(f"Filtered data from {filename}:")
-        print(filtered_df)
-        print("\n")
 
     # Mapping of long file names to short labels
     df_short_names = {
@@ -635,7 +629,7 @@ def main():
 
     # Visualizing clusters
     cluster_column = 'Cluster'
-
+    
     visualize_clusters(clustered_data, cluster_column,
                        features_to_cluster, cluster_centers)
 
@@ -648,7 +642,7 @@ def main():
     gdp_df_transposed = gdp_df.transpose()
 
     # List of selected countries and the range of years for prediction
-    selected_countries = ['India', 'Germany', 'Kenya']
+    selected_countries = ['United States', 'Germany', 'Kenya']
     
     # Titles of plots
     title_ghg = "Greenhouse Gases Emission"
