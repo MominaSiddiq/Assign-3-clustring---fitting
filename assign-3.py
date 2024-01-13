@@ -82,7 +82,7 @@ def read_data(filename):
 
 
 # Filtering all the indicators data for selected data 
-def filtered_data(data):
+def filtered_data(df, start_year, end_year):
     """
     filtering data on selective years and countries for all the indicators 
 
@@ -95,14 +95,30 @@ def filtered_data(data):
     filtered data.
 
     """
-    filtered_dataframes = {}
-
-    for key, df in data.items():
-        # Filter by selected years and countries
-        filtered_df = df.loc[selected_countries, selected_years]
-        filtered_dataframes[key] = filtered_df
+    # Ensure the DataFrame has an index named 'Country' or reset it if necessary
+    if df.index.name != 'Country Name':
+        if 'Country Name' in df.columns:
+            df.set_index('Country Name', inplace=True)
+        else:
+            print("Country Name column not found.")
+            return None
+        
+    # Convert years to string if necessary
+    start_year, end_year = str(start_year), str(end_year)
     
-    return filtered_dataframes
+    # Generate a list of year columns as strings
+    years = [str(year) for year in range(int(start_year), int(end_year) + 1)]
+    
+    # Ensure that all years are present in the dataframe columns
+    missing_years = [year for year in years if year not in df.columns]
+    if missing_years:
+        print(f"Missing year columns in dataframe: {missing_years}")
+        return None
+
+    # Filter for the range of years
+    filtered_df = df.loc[:, years]
+
+    return filtered_df
 
 
 # Obtaining the summary statistics of data by the describe method
