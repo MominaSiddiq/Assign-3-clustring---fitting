@@ -169,7 +169,7 @@ def corr_heatmap(dataframes, df_names):
         print("No numeric data available to plot.")
 
 
-def population_growth_pie(filtered_data, selected_countries):
+def population_growth_pie(filtered_data):
     """
     Plots a pie chart of the total population growth for selected countries 
     over the years 1990 to 2020.
@@ -200,23 +200,31 @@ def population_growth_pie(filtered_data, selected_countries):
     plt.show()
 
 
-def merge_datasets(df1, df2, countries, df1_column_name, df2_column_name):
+def merge_datasets(df1, df2, df1_column_name, df2_column_name):
     """
     Merge two datasets for specified countries.
 
-    Parameters:
-    df1 (pd.DataFrame): First DataFrame.
-    df2 (pd.DataFrame): Second DataFrame.
-    countries (list): List of countries to include in the merge.
-    df1_name (str): Column name for values from the first DataFrame.
-    df2_name (str): Column name for values from the second DataFrame.
+    Parameters
+    ----------
+    df1 (pd.DataFrame): 
+        First DataFrame.
+        
+    df2 (pd.DataFrame): 
+        Second DataFrame.
+        
+    df1_name (str): 
+        Column name for values from the first DataFrame.
+        
+    df2_name (str): 
+        Column name for values from the second DataFrame.
 
-    Returns:
+    Returns
+    -------
     pd.DataFrame: Merged data for the specified countries.
     """
     merged_data_list = []
 
-    for country in countries:
+    for country in selected_countries:
         for year in df1.columns:  # Assuming years are columns in df1
             df1_value = df1.loc[country,
                                 year] if country in df1.index else None
@@ -238,12 +246,14 @@ def perform_clustering_and_find_centers(data, num_clusters, features):
     """
     Perform clustering on the provided dataset and find the cluster centers.
 
-    Parameters:
+    Parameters
+    ----------
     data (pd.DataFrame): The dataset to cluster.
     num_clusters (int): The number of clusters to form.
     features (list): List of column names to use for clustering.
 
-    Returns:
+    Returns
+    -------
     tuple: 
         - The original dataset with an additional 'Cluster' column.
         - The cluster centers as a numpy array.
@@ -270,12 +280,14 @@ def visualize_clusters(data, cluster_column, feature_columns, centers):
     """
     Visualize the clustering results.
 
-    Parameters:
+    Parameters
+    ----------
     data (pd.DataFrame): The clustered dataset.
     cluster_column (str): The name of the column containing cluster labels.
     feature_columns (list): List of column names to use for visualization.
 
-    Returns:
+    Returns
+    -------
     None: The function will output plots directly.
     """
    # Create a pairplot colored by cluster labels
@@ -570,15 +582,16 @@ def main():
     renewable_df = filtered_dfs['renewable_energy_consumption_trans.csv']
 
     # Selected countries for visualization
+    global selected_countries
     selected_countries = ['United States', 'India', 'Kenya', 'Germany',
                           'Brazil', 'China', 'Australia', 'South Africa', 'Japan', 'Canada']
 
     # Population growth pie chart
-    population_growth_pie(pop_df, selected_countries)
+    population_growth_pie(pop_df)
 
     # Merging datasets for clusters
     merged_data = merge_datasets(
-        co2_df, renewable_df, selected_countries, "CO2_Emission", "Renewable_Energy")
+        co2_df, renewable_df, "CO2_Emission", "Renewable_Energy")
 
     # Assuming 'merged_data' is your merged dataset and you want to cluster based on CO2 emissions and renewable energy
     features_to_cluster = ['CO2_Emission', 'Renewable_Energy']
