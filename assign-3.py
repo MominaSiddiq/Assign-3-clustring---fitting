@@ -288,26 +288,55 @@ def visualize_clusters(data, cluster_column, feature_columns, centers):
 # Polynomial model function
 def poly_model(x, a, b, c):
     """
-    A model prepared for the fitting. 
+    Defines a second-order polynomial (quadratic) model for curve fitting.
 
     Parameters
     ----------
-    x : int
+    x : array_like
+        The independent variable where the data is measured, typically representing time or space.
         
-    a : int
+    a : float
+        Coefficient for the quadratic term in the polynomial equation.
         
-    b : int
+    b : float
+        Coefficient for the linear term in the polynomial equation.
         
-    c : int
-        
+    c : float
+        Constant term in the polynomial equation.
 
     Returns
     -------
-    int
-        A prepared model.
+    array_like
+        The values of the polynomial at x, given the specified coefficients.
 
     """
     return a * x**2 + b * x + c
+
+
+# Function to fit the model to the data
+def fit_model(years, emissions):
+    """
+    Fitting the curve fit model to the data.
+
+    Parameters
+    ----------
+    years : ndarray or list
+        The independent data — typically years — over which the model is to be fitted.
+        
+    emissions : ndarray or list
+        The dependent data — typically emissions — which we are trying to fit with the model.
+
+    Returns
+    -------
+    popt : ndarray
+        Optimal values for the parameters so that the sum of the squared residuals of the model fit is minimized.
+        
+    pcov : 2d ndarray
+        The covariance matrix of the parameters. The diagonal elements represent the variance of the fitted parameters.
+    
+    """
+    popt, pcov = curve_fit(poly_model, years, emissions)
+    return popt, pcov
 
 
    
