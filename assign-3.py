@@ -386,6 +386,55 @@ def err_ranges(x, popt, pcov, confidence=0.95):
     
     return y_upper, y_lower
 
+
+# Function to plot the historical data and future predictions with confidence intervals
+def plot_emissions(country, years, emissions, future_years, popt, pcov, title):
+    """
+   Plots historical emissions data and future predictions with confidence intervals for a given country.
+
+    Parameters:
+    ----------
+    country : str
+        The name of the country for which emissions data is plotted.
+    years : array_like
+        Array of years for the historical data.
+    emissions : array_like
+        Array of observed emission values corresponding to the years.
+    future_years : array_like
+        Array of future years for which predictions are made.
+    popt : array_like
+        Optimal parameters obtained from the curve fitting process.
+    pcov : 2d array_like
+        Covariance matrix of the optimal parameters.
+    title : str
+        The title for the plot.
+
+    Returns:
+    -------
+    None: Displays a plot showing historical emissions, fitted model, and future predictions with confidence intervals.
+
+    """
+    plt.figure(figsize=(10, 5))
+
+    # Predictions for historical and future years using the model
+    y_model = poly_model(years, *popt)
+    y_future = poly_model(future_years, *popt)
+    y_future_upper, y_future_lower = err_ranges(future_years, popt, pcov)
+
+    # Plot historical data
+    plt.scatter(years, emissions, label='Historical Data', color='green')
+    plt.plot(years, y_model, label='Fitted Model', color='blue')
+
+    # Plot future predictions with confidence intervals
+    plt.plot(future_years, y_future, label='Future Predictions', color='red')
+    plt.fill_between(future_years, y_future_lower, y_future_upper, color='lightgray', alpha=0.3, label='Confidence Interval')
+
+    plt.title(f"{title} {country}")
+    plt.xlabel('Year')
+    plt.ylabel('Emissions')
+    plt.legend()
+    plt.show()
+
    
 def main():
     """
