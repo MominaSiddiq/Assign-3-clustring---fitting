@@ -283,6 +283,32 @@ def visualize_clusters(data, cluster_column, feature_columns, centers):
         sns.barplot(x=cluster_column, y=feature, data=data)
         plt.title(f'Average {feature} by Cluster')
         plt.show()
+        
+        
+# Polynomial model function
+def poly_model(x, a, b, c):
+    """
+    A model prepared for the fitting. 
+
+    Parameters
+    ----------
+    x : int
+        
+    a : int
+        
+    b : int
+        
+    c : int
+        
+
+    Returns
+    -------
+    int
+        A prepared model.
+
+    """
+    return a * x**2 + b * x + c
+
 
    
 def main():
