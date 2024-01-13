@@ -16,23 +16,6 @@ from sklearn.cluster import KMeans
 from scipy.optimize import curve_fit
 from scipy.stats import t
 
-# giving the filenames path of choosen indicators
-elec_access = "electricity_access.csv"
-#elec_power = "electric_power.csv"
-#energy_use = "energy_use.csv"
-co2_emission = "CO2_emission.csv"
-energy_consumption = "renewable_energy_consumption.csv"
-popu_growth = "population_growth.csv"
-greenhouse_emission = "greenhouse_gas_emission.csv"
-
-# Creating global variables
-selected_countries = {}
-start_year = 1990
-end_year = 2020
-selected_years = {}
-#grouped_data = {}
-selected_data = {}
-
 
 def read_data(filename):
     """
@@ -60,17 +43,23 @@ def read_data(filename):
     data.dropna(axis = 1, how = 'all', inplace = True)
 
     # Drop the unnecessary columns in the data
-    data.drop(columns = ['Country Code', 'Indicator Name', 'Indicator Code'], inplace = True)
-    country_col_df = data
-
+    data.drop(columns = ['Country Code', 'Indicator Name',
+              'Indicator Code'], inplace = True)
+    
     # taking the transpose
     years_col_df = data.T
 
+    # setting the header
     years_col_df.columns = years_col_df.iloc[0]
     years_col_df = years_col_df[1:]
-    years_col_df.index.name = 'Year'  # Set the index name as 'Year' after transpose
-    years_col_df = years_col_df.reset_index()
 
+    # reset index for making years as columns
+    years_col_df = years_col_df.reset_index()
+    years_col_df = years_col_df.rename(columns = {'index': 'Year'})
+
+    # setting years as index
+    years_col_df.set_index('Year', inplace = True)
+    
     # removing empty rows
     years_col_df.dropna(axis = 0, how = 'all', inplace = True)
 
@@ -82,22 +71,13 @@ def read_data(filename):
 
     # Removing any duplicated rows
     years_col_df = years_col_df[~years_col_df.index.duplicated(keep='first')]
-
-    print(years_col_df)
-    #years_col_df.to_csv("transpose.csv")
-    print("=" * 50)
     
+    # taking the transpose again for country column 
     country_col_df = years_col_df.T
-    #country_col_df.index.name = 'Country Name'
     
-    country_col_df.columns = country_col_df.iloc[0]
-    country_col_df = country_col_df[1:]
-    country_col_df.index.name = 'Country'  # Set the index name as 'Country' after transpose
-    country_col_df.to_csv("re-trans.csv")
+    # Reset index for making countries as columns
+    country_col_df = country_col_df.reset_index().rename(columns={'index': 'Country'})
     
-    print(country_col_df)
-
-
     return country_col_df, years_col_df
 
 
