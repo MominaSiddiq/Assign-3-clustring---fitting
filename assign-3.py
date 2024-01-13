@@ -186,41 +186,37 @@ def population_growth_pie(filtered_data, selected_countries):
     plt.show()
 
 
-def normalize_data(df_dict):
+def merge_datasets(df1, df2, countries, df1_column_name, df2_column_name):
     """
-    Normalize the DataFrames stored in a dictionary.
+    Merge two datasets for specified countries.
 
-    Parameters
-    ----------
-    df_dict : dict
-        Dictionary containing DataFrames for each indicator.
+    Parameters:
+    df1 (pd.DataFrame): First DataFrame.
+    df2 (pd.DataFrame): Second DataFrame.
+    countries (list): List of countries to include in the merge.
+    df1_name (str): Column name for values from the first DataFrame.
+    df2_name (str): Column name for values from the second DataFrame.
 
-    Returns
-    -------
-    normalized_dict : dict
-        Dictionary containing normalized DataFrames for each indicator.
-    min_vals : dict
-        Dictionary containing minimum values for each indicator.
-    max_vals : dict
-        Dictionary containing maximum values for each indicator.
+    Returns:
+    pd.DataFrame: Merged data for the specified countries.
     """
-    normalized_dict = {}
-    min_vals = {}
-    max_vals = {}
+    merged_data_list = []
 
-    for indicator, df in df_dict.items():
-        min_val = df.values.min()
-        max_val = df.values.max()
+    for country in countries:
+        for year in df1.columns:  # Assuming years are columns in df1
+            df1_value = df1.loc[country, year] if country in df1.index else None
+            df2_value = df2.loc[country, year] if country in df2.index else None
 
-        # Normalize the DataFrame
-        normalized_df = (df - min_val) / (max_val - min_val)
+            row_data = {
+                'Country': country,
+                'Year': year,
+                df1_column_name: df1_value,
+                df2_column_name: df2_value
+            }
+            merged_data_list.append(row_data)
 
-        normalized_dict[indicator] = normalized_df
-        min_vals[indicator] = min_val
-        max_vals[indicator] = max_val
+    return pd.DataFrame(merged_data_list)
 
-    return normalized_dict, min_vals, max_vals
-    
         
 def clustering(extracted_df, cluster_number):
     """
@@ -394,6 +390,10 @@ def main():
     
     # Population growth pie chart
     population_growth_pie(pop_df, selected_countries)
+    
+    # Merging datasets for clusters 
+    merged_data = merge_datasets(co2_df, renewable_df, selected_countries, "CO2_Emission", "Renewable_Energy")
+
     
     
 
