@@ -104,7 +104,7 @@ def filtered_data(df):
     # Ensure the DataFrame has an index named 'Country' or reset it if necessary
     if df.index.name != 'Country Name':
         if 'Country Name' in df.columns:
-            df.set_index('Country Name', inplace=True)
+            df.set_index('Country Name', inplace = True)
         else:
             print("Country Name column not found.")
             return None
@@ -153,16 +153,16 @@ def corr_heatmap(dataframes, df_names):
 
     # Plotting heatmap for dataset correlations
     plt.figure(figsize=(10, 8))
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+    sns.heatmap(correlation_matrix, annot = True, cmap = 'coolwarm', fmt = '.2f')
     plt.title('Correlation Heatmap between Datasets')
     plt.show()
 
     # Ensure all data can be converted to numeric, otherwise set as NaN
-    summary_numeric = summary_df.apply(pd.to_numeric, errors='coerce')
-    summary_numeric.dropna(axis=1, how='all', inplace=True)
+    summary_numeric = summary_df.apply(pd.to_numeric, errors = 'coerce')
+    summary_numeric.dropna(axis = 1, how = 'all', inplace = True)
 
     if len(summary_numeric.columns) > 1:  # Checking if there are more than one numeric columns
-        pd.plotting.scatter_matrix(summary_numeric, figsize=(9.0, 9.0))
+        pd.plotting.scatter_matrix(summary_numeric, figsize = (9.0, 9.0))
         plt.tight_layout()
         plt.show()
     else:
@@ -191,12 +191,12 @@ def population_growth_pie(filtered_data):
     population_data = filtered_data.loc[selected_countries]
 
     # Calculate the total population growth over the years 1990 to 2020 for selected countries
-    total_population_growth = population_data.sum(axis=1)
+    total_population_growth = population_data.sum(axis = 1)
 
     # Plotting the pie chart
-    plt.figure(figsize=(10, 8))
-    plt.pie(total_population_growth, labels=total_population_growth.index,
-            autopct='%1.1f%%', startangle=140)
+    plt.figure(figsize = (10, 8))
+    plt.pie(total_population_growth, labels = total_population_growth.index,
+            autopct = '%1.1f%%', startangle = 140)
     plt.show()
 
 
@@ -268,7 +268,7 @@ def perform_clustering_and_find_centers(data, num_clusters, features):
     data_normalized = scaler.fit_transform(data[features])
 
     # Applying K-means clustering
-    kmeans = KMeans(n_clusters=num_clusters, random_state=0)
+    kmeans = KMeans(n_clusters = num_clusters, random_state = 0)
     kmeans.fit(data_normalized)
     clusters = kmeans.predict(data_normalized)
 
@@ -305,8 +305,8 @@ def visualize_clusters(data, cluster_column, feature_columns, centers):
     """
    # Create a pairplot colored by cluster labels
     pairplot_fig = sns.pairplot(
-        data, vars=feature_columns, hue=cluster_column, palette='bright')
-    plt.suptitle('Pairplot of Features by Cluster', y=1.02)
+        data, vars=feature_columns, hue=cluster_column, palette = 'bright')
+    plt.suptitle('Pairplot of Features by Cluster', y = 1.02)
 
     # Extract axes from pairplot to plot centers
     axes = pairplot_fig.axes
@@ -316,14 +316,14 @@ def visualize_clusters(data, cluster_column, feature_columns, centers):
             if i != j:
                 ax = axes[i][j]
                 ax.scatter(centers[:, j], centers[:, i],
-                           c='red', s=100, marker='X')  # Plot centers
+                           c = 'red', s = 100, marker = 'X')  # Plot centers
 
     plt.show()
 
     # Create individual bar plots for each feature by cluster
     for feature in feature_columns:
-        plt.figure(figsize=(8, 4))
-        sns.barplot(x=cluster_column, y=feature, data=data)
+        plt.figure(figsize = (8, 4))
+        sns.barplot(x=cluster_column, y = feature, data = data)
         plt.title(f'Average {feature} by Cluster')
         plt.show()
 
@@ -389,7 +389,7 @@ def fit_model(years, emissions):
 
 
 # Error range calculation function
-def err_ranges(x, popt, pcov, confidence=0.95):
+def err_ranges(x, popt, pcov, confidence = 0.95):
     """
 
 
@@ -432,7 +432,7 @@ def err_ranges(x, popt, pcov, confidence=0.95):
     sigma = np.sqrt(np.diag(var_model))  # Standard deviation at each point
 
     # The t value for confidence interval
-    t_val = t.ppf((1+confidence)/2., len(x)-len(popt))
+    t_val = t.ppf((1 + confidence) / 2., len(x) - len(popt))
 
     # Upper and lower bounds
     y_upper = y_model + t_val * sigma
@@ -451,39 +451,46 @@ def plot_emissions(country, years, emissions, future_years, popt, pcov, title):
     ----------
     country : str
         The name of the country for which emissions data is plotted.
+        
     years : array_like
         Array of years for the historical data.
+        
     emissions : array_like
         Array of observed emission values corresponding to the years.
+        
     future_years : array_like
         Array of future years for which predictions are made.
+        
     popt : array_like
         Optimal parameters obtained from the curve fitting process.
+        
     pcov : 2d array_like
         Covariance matrix of the optimal parameters.
+        
     title : str
         The title for the plot.
 
     Returns:
     -------
-    None: Displays a plot showing historical emissions, fitted model, and future predictions with confidence intervals.
+    None: Displays a plot showing historical emissions, fitted model, and future
+    predictions with confidence intervals.
 
     """
-    plt.figure(figsize=(10, 5))
-
+    plt.figure(figsize = (10, 5))
+ 
     # Predictions for historical and future years using the model
     y_model = poly_model(years, *popt)
     y_future = poly_model(future_years, *popt)
     y_future_upper, y_future_lower = err_ranges(future_years, popt, pcov)
 
     # Plot historical data
-    plt.scatter(years, emissions, label='Historical Data', color='green')
-    plt.plot(years, y_model, label='Fitted Model', color='blue')
+    plt.scatter(years, emissions, label = 'Historical Data', color = 'green')
+    plt.plot(years, y_model, label = 'Fitted Model', color = 'blue')
 
     # Plot future predictions with confidence intervals
-    plt.plot(future_years, y_future, label='Future Predictions', color='red')
+    plt.plot(future_years, y_future, label = 'Future Predictions', color = 'red')
     plt.fill_between(future_years, y_future_lower, y_future_upper,
-                     color='lightgray', alpha=0.3, label='Confidence Interval')
+                     color = 'lightgray', alpha = 0.3, label = 'Confidence Interval')
 
     plt.title(f"{title} {country}")
     plt.xlabel('Year')
@@ -500,9 +507,8 @@ def run_analysis(df, future_year_span, title):
 
     Parameters:
     ----------
-    country : str
-        The name of the country for which emissions data is plotted.
-    
+    df : python dataframe
+        
     future_years : array_like
         Array of future years for which predictions are made.
         
@@ -558,7 +564,7 @@ def main():
         transposed_files.append(transposed_filename)
 
         # Save the transposed data
-        country_col_df.to_csv(transposed_filename, index=False)
+        country_col_df.to_csv(transposed_filename, index = False)
 
     # List to store filtered DataFrames
     filtered_dfs = {}
@@ -617,9 +623,11 @@ def main():
     merged_data = merge_datasets(
         co2_df, renewable_df, "CO2_Emission", "Renewable_Energy")
 
-    # Assuming 'merged_data' is your merged dataset and you want to cluster based on CO2 emissions and renewable energy
+    # Selecting indicators for clustering
     features_to_cluster = ['CO2_Emission', 'Renewable_Energy']
-    num_clusters = 3  # You can adjust the number of clusters as needed
+    
+    # Number of clusters
+    num_clusters = 3  
 
     # Performing clustering on the merged data
     clustered_data, cluster_centers = perform_clustering_and_find_centers(
@@ -627,11 +635,11 @@ def main():
 
     # Visualizing clusters
     cluster_column = 'Cluster'
-    features_for_visualization = ['CO2_Emission', 'Renewable_Energy']
 
     visualize_clusters(clustered_data, cluster_column,
-                       features_for_visualization, cluster_centers)
+                       features_to_cluster, cluster_centers)
 
+    # Extracting datasets for fitting
     greenhouse_df = filtered_dfs['greenhouse_gas_emission_trans.csv']
     gdp_df = filtered_dfs['GDP_per_capita_trans.csv']
 
@@ -640,8 +648,9 @@ def main():
     gdp_df_transposed = gdp_df.transpose()
 
     # List of selected countries and the range of years for prediction
-    #global selected_countries
     selected_countries = ['India', 'Germany', 'Kenya']
+    
+    # Titles of plots
     title_ghg = "Greenhouse Gases Emission"
     title_gdp = "GDP_per_capita"
     
