@@ -232,10 +232,10 @@ def merge_datasets(df1, df2, df1_column_name, df2_column_name):
                                 year] if country in df2.index else None
 
             row_data = {
-                'Country': country,
+                'Country' : country,
                 'Year': year,
-                df1_column_name: df1_value,
-                df2_column_name: df2_value
+                df1_column_name : df1_value,
+                df2_column_name : df2_value
             }
             merged_data_list.append(row_data)
 
