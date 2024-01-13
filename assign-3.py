@@ -248,9 +248,14 @@ def perform_clustering_and_find_centers(data, num_clusters, features):
 
     Parameters
     ----------
-    data (pd.DataFrame): The dataset to cluster.
-    num_clusters (int): The number of clusters to form.
-    features (list): List of column names to use for clustering.
+    data (pd.DataFrame): 
+        The dataset to cluster.
+        
+    num_clusters (int): 
+        The number of clusters to form.
+        
+    features (list): 
+        List of column names to use for clustering.
 
     Returns
     -------
@@ -282,9 +287,17 @@ def visualize_clusters(data, cluster_column, feature_columns, centers):
 
     Parameters
     ----------
-    data (pd.DataFrame): The clustered dataset.
-    cluster_column (str): The name of the column containing cluster labels.
-    feature_columns (list): List of column names to use for visualization.
+    data (pd.DataFrame): 
+        The clustered dataset.
+        
+    cluster_column (str): 
+        The name of the column containing cluster labels.
+        
+    feature_columns (list): 
+        List of column names to use for visualization.
+        
+    centers: 
+        Centers of the clusters.    
 
     Returns
     -------
@@ -323,7 +336,8 @@ def poly_model(x, a, b, c):
     Parameters
     ----------
     x : array_like
-        The independent variable where the data is measured, typically representing time or space.
+        The independent variable where the data is measured, typically
+        representing time or space.
 
     a : float
         Coefficient for the quadratic term in the polynomial equation.
@@ -337,7 +351,8 @@ def poly_model(x, a, b, c):
     Returns
     -------
     array_like
-        The values of the polynomial at x, given the specified coefficients.
+        The values of the polynomial at x, given the specified 
+        coefficients.
 
     """
     return a * x**2 + b * x + c
@@ -351,18 +366,22 @@ def fit_model(years, emissions):
     Parameters
     ----------
     years : ndarray or list
-        The independent data — typically years — over which the model is to be fitted.
+        The independent data — typically years — over which the model is to 
+        be fitted.
 
     emissions : ndarray or list
-        The dependent data — typically emissions — which we are trying to fit with the model.
+        The dependent data — typically emissions — which we are trying to fit 
+        with the model.
 
     Returns
     -------
     popt : ndarray
-        Optimal values for the parameters so that the sum of the squared residuals of the model fit is minimized.
+        Optimal values for the parameters so that the sum of the squared 
+        residuals of the model fit is minimized.
 
     pcov : 2d ndarray
-        The covariance matrix of the parameters. The diagonal elements represent the variance of the fitted parameters.
+        The covariance matrix of the parameters. The diagonal elements 
+        represent the variance of the fitted parameters.
 
     """
     popt, pcov = curve_fit(poly_model, years, emissions)
@@ -379,16 +398,20 @@ def err_ranges(x, popt, pcov, confidence=0.95):
     Parameters
     ----------
     x : array_like
-        The independent variable values where the predictions are to be made.
+        The independent variable values where the predictions are to 
+        be made.
 
     popt : array_like
-        Optimal values for the parameters so that the sum of the squared residuals of f(xdata, *popt) - ydata is minimized.
+        Optimal values for the parameters so that the sum of the squared 
+        residuals of f(xdata, *popt) - ydata is minimized.
 
     pcov : 2d array_like
-        The estimated covariance of popt. The diagonals provide the variance of the parameter estimate.
+        The estimated covariance of popt. The diagonals provide the variance 
+        of the parameter estimate.
 
     confidence : float, optional
-        The confidence level for the interval calculation. The default is 0.95 for a 95% confidence interval.
+        The confidence level for the interval calculation. The default is 
+        0.95 for a 95% confidence interval.
 
     Returns
     -------
@@ -421,7 +444,8 @@ def err_ranges(x, popt, pcov, confidence=0.95):
 # Function to plot the historical data and future predictions with confidence intervals
 def plot_emissions(country, years, emissions, future_years, popt, pcov, title):
     """
-   Plots historical emissions data and future predictions with confidence intervals for a given country.
+   Plots historical emissions data and future predictions with 
+   confidence intervals for a given country.
 
     Parameters:
     ----------
@@ -469,7 +493,7 @@ def plot_emissions(country, years, emissions, future_years, popt, pcov, title):
 
 
 # Main analysis function
-def run_analysis(df, countries, future_year_span, title):
+def run_analysis(df, future_year_span, title):
     """
     Plots historical emissions data and future predictions with confidence 
     intervals for a given country.
@@ -495,7 +519,7 @@ def run_analysis(df, countries, future_year_span, title):
     # Ensure the index is integer-based for proper slicing
     df.index = pd.to_numeric(df.index)
 
-    for country in countries:
+    for country in selected_countries:
         # Extract data for the country
         emissions = df.loc[start_year:end_year, country].values
         years = np.arange(start_year, end_year + 1)
@@ -616,13 +640,14 @@ def main():
     gdp_df_transposed = gdp_df.transpose()
 
     # List of selected countries and the range of years for prediction
+    #global selected_countries
     selected_countries = ['India', 'Germany', 'Kenya']
     title_ghg = "Greenhouse Gases Emission"
     title_gdp = "GDP_per_capita"
     
     # Running the fitting visualization 
-    run_analysis(greenhouse_df_transposed, selected_countries, 20, title_ghg)
-    run_analysis(gdp_df_transposed, selected_countries, 20, title_gdp)
+    run_analysis(greenhouse_df_transposed, 20, title_ghg)
+    run_analysis(gdp_df_transposed, 20, title_gdp)
 
 
 if __name__ == "__main__":
